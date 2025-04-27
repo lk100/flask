@@ -52,8 +52,8 @@ def submit_journal():
         logging.debug(f"Predicted emotion: {emotion}")  # Log the predicted emotion
         return jsonify({"success": True, "emotion": emotion})
     except Exception as e:
-        logging.error(f"Error during prediction: {e}")  # Log the error for debugging
-        return jsonify({"error": str(e)}), 500
+        logging.error(f"Error during sentiment analysis: {e}")
+       return jsonify({"error": "Failed to process the text."}), 500
 
 # Run the Flask app
 if __name__ == "__main__":
