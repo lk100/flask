@@ -53,7 +53,7 @@ def submit_journal():
         return jsonify({"success": True, "emotion": emotion})
     except Exception as e:
         logging.error(f"Error during sentiment analysis: {e}")
-       return jsonify({"error": "Failed to process the text."}), 500
+        return jsonify({"error": "Failed to process the text."}), 500
 
 # Run the Flask app
 if __name__ == "__main__":
