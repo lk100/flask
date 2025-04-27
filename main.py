@@ -12,6 +12,10 @@ classifier = pipeline(
 # Initialize the Flask app
 app = Flask(__name__)
 
+# Enable CORS for allowing cross-origin requests from frontend (replace with your actual frontend URL)
+from flask_cors import CORS
+CORS(app, origins=["https://mindbliss.up.railway.app"])
+
 # Define a route for sentiment analysis
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -22,11 +26,15 @@ def predict():
     if not user_input:
         return jsonify({"error": "Text is required"}), 400
     
-    # Get sentiment analysis result
-    result = classifier(user_input)
+    try:
+        # Get sentiment analysis result
+        result = classifier(user_input)
+        # Return the result as JSON
+        return jsonify(result)
     
-    # Return the result as JSON
-    return jsonify(result)
+    except Exception as e:
+        # Handle any errors during model inference
+        return jsonify({"error": str(e)}), 500
 
 # Run the Flask app
 if __name__ == "__main__":
