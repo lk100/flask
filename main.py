@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # Import CORS
+from flask_cors import CORS
 from transformers import pipeline
 import os
 
@@ -14,7 +14,7 @@ classifier = pipeline(
 # Initialize the Flask app
 app = Flask(__name__)
 
-# Enable CORS for the frontend domain (adjust as needed)
+# Enable CORS for the frontend domain
 CORS(app, origins=["https://mindbliss.up.railway.app"])
 
 # Define a route for sentiment analysis
@@ -28,11 +28,13 @@ def submit_journal():
         return jsonify({"error": "Missing text or user_id"}), 400
 
     try:
-        # Get sentiment analysis result
+        print("Received text:", user_text)  # Log the received text
         result = classifier(user_text)
         emotion = result[0]["label"]
+        print("Predicted emotion:", emotion)  # Log the predicted emotion
         return jsonify({"success": True, "emotion": emotion})
     except Exception as e:
+        print(f"Error during prediction: {e}")  # Log the error for debugging
         return jsonify({"error": str(e)}), 500
 
 # Run the Flask app
