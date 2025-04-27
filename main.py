@@ -7,38 +7,36 @@ import logging
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 
-# Initialize model loading flag and model variable
-model_loaded = False
-classifier = None
-
 # Initialize the Flask app
 app = Flask(__name__)
 
 # Enable CORS for the frontend domain
 CORS(app, origins=["https://mindbliss.up.railway.app"])
 
+# Initialize the model globally
+classifier = None
+
+# Function to load the model at app startup
 def load_model():
-    global model_loaded, classifier
-    if not model_loaded:
-        try:
-            logging.info("Loading model...")
-            classifier = pipeline(
-                "sentiment-analysis",
-                model="lk1307/love_model",
-                token="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",
-                framework="pt"  # Force PyTorch
-            )
-            model_loaded = True
-            logging.info("Model loaded successfully.")
-        except Exception as e:
-            logging.error(f"Error loading model: {e}")
+    global classifier
+    try:
+        logging.info("Loading model...")
+        classifier = pipeline(
+            "sentiment-analysis",
+            model="lk1307/love_model",
+            token="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",
+            framework="pt"  # Force PyTorch
+        )
+        logging.info("Model loaded successfully.")
+    except Exception as e:
+        logging.error(f"Error loading model: {e}")
+
+# Load the model when the app starts
+load_model()
 
 # Define a route for sentiment analysis
 @app.route("/predict", methods=["POST"])
 def submit_journal():
-    # Load the model only if it's not already loaded
-    load_model()
-
     # Get input data
     data = request.get_json()
     user_text = data.get("text")
