@@ -27,12 +27,13 @@ def submit_journal():
     if not user_text or not user_id:
         return jsonify({"error": "Missing text or user_id"}), 400
 
-    # Get sentiment analysis result
-    result = classifier(user_text)
-    emotion = result[0]["label"]
-
-    # Simulate saving to the database (you can connect to a real database here)
-    return jsonify({"success": True, "emotion": emotion})
+  try:
+        # Get sentiment analysis result
+        result = classifier(user_text)
+        emotion = result[0]["label"]
+        return jsonify({"success": True, "emotion": emotion})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # Run the Flask app
 if __name__ == "__main__":
