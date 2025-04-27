@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask_cors import CORS  # Import CORS
 from transformers import pipeline
 
 # Load the Hugging Face model
@@ -13,28 +13,25 @@ classifier = pipeline(
 # Initialize the Flask app
 app = Flask(__name__)
 
-# Enable CORS for allowing cross-origin requests from the frontend domain
-CORS(app, origins=["https://mindbliss.up.railway.app"], allow_headers=["Content-Type", "Authorization"])
+# Enable CORS for the frontend domain (adjust as needed)
+CORS(app, origins=["https://mindbliss.up.railway.app"])
 
 # Define a route for sentiment analysis
-@app.route("/predict", methods=["POST"])
-def predict():
-    # Get the input text from the JSON request
+@app.route("/submit-journal", methods=["POST"])
+def submit_journal():
     data = request.get_json()
-    user_input = data.get("text")
+    user_text = data.get("text")
+    user_id = data.get("user_id")
 
-    if not user_input:
-        return jsonify({"error": "Text is required"}), 400
+    if not user_text or not user_id:
+        return jsonify({"error": "Missing text or user_id"}), 400
 
-    try:
-        # Get sentiment analysis result
-        result = classifier(user_input)
-        # Return the result as JSON
-        return jsonify(result)
+    # Get sentiment analysis result
+    result = classifier(user_text)
+    emotion = result[0]["label"]
 
-    except Exception as e:
-        # Handle any errors during model inference
-        return jsonify({"error": str(e)}), 500
+    # Simulate saving to the database (you can connect to a real database here)
+    return jsonify({"success": True, "emotion": emotion})
 
 # Run the Flask app
 if __name__ == "__main__":
