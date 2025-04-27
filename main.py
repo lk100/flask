@@ -17,7 +17,7 @@ app = Flask(__name__)
 CORS(app, origins=["https://mindbliss.up.railway.app"])
 
 # Define a route for sentiment analysis
-@app.route("/submit-journal", methods=["POST"])
+@app.route("/predict", methods=["POST"])
 def submit_journal():
     data = request.get_json()
     user_text = data.get("text")
