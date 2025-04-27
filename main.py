@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS  # Import CORS
 from transformers import pipeline
-import os 
+import os
 
 # Load the Hugging Face model
 classifier = pipeline(
@@ -27,7 +27,7 @@ def submit_journal():
     if not user_text or not user_id:
         return jsonify({"error": "Missing text or user_id"}), 400
 
-  try:
+    try:
         # Get sentiment analysis result
         result = classifier(user_text)
         emotion = result[0]["label"]
