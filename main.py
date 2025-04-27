@@ -4,40 +4,23 @@ from transformers import pipeline
 import os
 import logging
 
-# Set up logging
 logging.basicConfig(level=logging.DEBUG)
 
-# Initialize the Flask app
 app = Flask(__name__)
-
-# Enable CORS for the frontend domain
 CORS(app, origins=["https://mindbliss.up.railway.app"])
 
-# Initialize the model globally
-classifier = None
+# Load model once globally
+logging.info("Loading model...")
+classifier = pipeline(
+    "sentiment-analysis",
+    model="lk1307/love_model",
+    token="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",
+    framework="pt"
+)
+logging.info("Model loaded successfully.")
 
-# Function to load the model at app startup
-def load_model():
-    global classifier
-    try:
-        logging.info("Loading model...")
-        classifier = pipeline(
-            "sentiment-analysis",
-            model="lk1307/love_model",
-            token="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",
-            framework="pt"  # Force PyTorch
-        )
-        logging.info("Model loaded successfully.")
-    except Exception as e:
-        logging.error(f"Error loading model: {e}")
-
-# Load the model when the app starts
-load_model()
-
-# Define a route for sentiment analysis
 @app.route("/predict", methods=["POST"])
 def submit_journal():
-    # Get input data
     data = request.get_json()
     user_text = data.get("text")
     user_id = data.get("user_id")
@@ -46,16 +29,15 @@ def submit_journal():
         return jsonify({"error": "Missing text or user_id"}), 400
 
     try:
-        logging.debug(f"Received text: {user_text}")  # Log the received text
+        logging.debug(f"Received text: {user_text}")
         result = classifier(user_text)
         emotion = result[0]["label"]
-        logging.debug(f"Predicted emotion: {emotion}")  # Log the predicted emotion
+        logging.debug(f"Predicted emotion: {emotion}")
         return jsonify({"success": True, "emotion": emotion})
     except Exception as e:
         logging.error(f"Error during sentiment analysis: {e}")
         return jsonify({"error": "Failed to process the text."}), 500
 
-# Run the Flask app
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Default to 5000 if not set by Railway
-    app.run(debug=True, host="0.0.0.0", port=port)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
